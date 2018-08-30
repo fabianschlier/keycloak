@@ -21,6 +21,7 @@ import org.keycloak.broker.oidc.KeycloakOIDCIdentityProviderFactory;
 import org.keycloak.broker.oidc.OIDCIdentityProviderFactory;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.common.util.CollectionUtil;
+import org.keycloak.models.Constants;
 import org.keycloak.models.IdentityProviderMapperModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
@@ -116,6 +117,20 @@ public class UserAttributeMapper extends AbstractClaimMapper {
                     .collect(Collectors.toList());
 
             context.setUserAttribute(attribute, valuesToString);
+        }
+    }
+
+    @Override
+    public void importNewUser(KeycloakSession session, RealmModel realm, UserModel user, IdentityProviderMapperModel mapperModel,
+            BrokeredIdentityContext context) {
+        String attribute = mapperModel.getConfig().get(USER_ATTRIBUTE);
+        if(StringUtil.isNullOrEmpty(attribute)){
+            return;
+        }
+
+        if (!(EMAIL.equalsIgnoreCase(attribute) || FIRST_NAME.equalsIgnoreCase(attribute) || LAST_NAME.equalsIgnoreCase(attribute))) {
+            // As the context.getUserAttribute(..) method reduces the attributes to the first element, we need to handle this a bit ugly here!
+            user.setAttribute(attribute, (List<String>) context.getContextData().get(Constants.USER_ATTRIBUTES_PREFIX + attribute));
         }
     }
 
