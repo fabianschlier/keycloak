@@ -31,6 +31,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.keycloak.connections.httpclient.HttpClientProvider;
@@ -219,7 +220,7 @@ public class SimpleHttp {
     }
 
     private StringEntity getJsonEntity() throws IOException {
-        return new StringEntity(JsonSerialization.writeValueAsString(entity));
+        return new StringEntity(JsonSerialization.writeValueAsString(entity), ContentType.getByMimeType(headers.get("Content-Type")));
     }
 
     private UrlEncodedFormEntity getFormEntityFromParameter() throws IOException{
