@@ -104,8 +104,17 @@ public class ImportUtils {
                         currRealm.setMasterAdminClient(null);
                     }
                 }
+                // Some constellations during deleting clients associated with policies require a set realm in the context.
+                boolean realmset = false;
+                if (session.getContext().getRealm() == null) {
+                    session.getContext().setRealm(realm);
+                    realmset = true;
+                }
                 // TODO: For migration between versions, it should be possible to delete just realm but keep it's users
                 model.removeRealm(realm.getId());
+                if (realmset) {
+                    session.getContext().setRealm(null);
+                }
             }
         }
 
